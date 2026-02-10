@@ -6,6 +6,7 @@ module.exports = async (req, res) => {
   const { first_name, middle_name, last_name, email, password } = req.body;
 
   try {
+    // Validation
     if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({
         error: "First name, last name, email, and password are required",
@@ -18,8 +19,8 @@ module.exports = async (req, res) => {
       password,
     });
 
-    // Tokens
-    const verification_code = crypto.randomBytes(32).toString("hex");
+    // Generate tokens
+    const verification_link = crypto.randomBytes(32).toString("hex");
     const api_key = crypto.randomBytes(32).toString("hex");
     const csrf_token = crypto.randomBytes(32).toString("hex");
 
@@ -29,24 +30,19 @@ module.exports = async (req, res) => {
       middle_name: middle_name || null,
       last_name,
       email,
-
-      // Auth-related
-      password_hash: null, // handled by Firebase Auth
       api_key,
       csrf_token,
-
-      // Account state
       status: "verifying",
-      verification_code,
+      verification_link,
+      verification_expires_at: Date.now() + 24 * 60 * 60 * 1000,
       reset_password_token: null,
-
       created_at: admin.firestore.FieldValue.serverTimestamp(),
       updated_at: admin.firestore.FieldValue.serverTimestamp(),
     };
 
     await db.collection("users").doc(user.uid).set(userData);
 
-    const verifyLink = `${process.env.FRONTEND_VERIFY_URL}?token=${verification_code}`;
+    const verifyLink = `${process.env.FRONTEND_VERIFY_URL}?token=${verification_link}`;
 
     await transporter.sendMail({
       from: `"BFAR Support" <${process.env.EMAIL_USER}>`,
@@ -54,19 +50,20 @@ module.exports = async (req, res) => {
       subject: "Verify Your Account",
       html: `
         <h2>Welcome to BFAR</h2>
-        <p>Please verify your account by clicking the link below:</p>
+        <p>Please verify your account:</p>
         <a href="${verifyLink}">${verifyLink}</a>
         <p>This link expires in 24 hours.</p>
       `,
     });
 
-    res.status(201).json({
-      message: "Registration successful. Verification link sent.",
+    return res.status(201).json({
+      message: "Registration successful. Verification email sent.",
     });
+
   } catch (error) {
     console.error(error);
 
-    // Cleanup auth user if Firestore write failed
+    // Cleanup created auth user if error occurs
     if (email) {
       const existingUser = await admin
         .auth()
@@ -78,6 +75,8 @@ module.exports = async (req, res) => {
       }
     }
 
-    res.status(400).json({ error: error.message });
+    return res.status(400).json({
+      error: error.message || "Registration failed",
+    });
   }
 };

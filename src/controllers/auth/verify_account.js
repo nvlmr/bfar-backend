@@ -6,8 +6,8 @@ module.exports = async (req, res) => {
   try {
     const snapshot = await db
       .collection("users")
-      .where("verifyToken", "==", token)
-      .where("verifyExpiry", ">", Date.now())
+      .where("verification_link", "==", token)
+      .where("verification_expires_at", ">", Date.now())
       .limit(1)
       .get();
 
@@ -21,10 +21,11 @@ module.exports = async (req, res) => {
 
     await userDoc.ref.update({
       status: "active",
-      verifyToken: null,
-      verifyExpiry: null,
+      verification_link: null,
+      verification_expires_at: null,
       updated_at: admin.firestore.FieldValue.serverTimestamp(),
     });
+
 
     res.json({ message: "Account verified successfully" });
   } catch (error) {

@@ -9,10 +9,10 @@ const forgotPassword = require("../controllers/auth/forgot_password");
 const resetPassword = require("../controllers/auth/reset_password")
 const deleteAccount = require("../controllers/auth/delete_account");
 
-
+  
 router.post("/register", register);
 router.post("/login", login);
-router.post("/verify_account", verifyAccount);
+router.get("/verify_account", verifyAccount);
 router.post("/forgot_password", forgotPassword);
 router.post("/reset_password", resetPassword);
 
