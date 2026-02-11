@@ -12,10 +12,11 @@ module.exports = async (req, res) => {
 
     const snapshot = await db
       .collection("users")
-      .where("resetToken", "==", token)
-      .where("resetExpiry", ">", Date.now())
+      .where("reset_password_token", "==", token) // match your field
+      .where("resetExpiry", ">", Date.now())      // you don't have this field yet
       .limit(1)
       .get();
+
 
     if (snapshot.empty) {
       return res.status(400).json({

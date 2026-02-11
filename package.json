@@ -17,10 +17,11 @@
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^4.22.1",
-    "firebase": "^12.8.0",
+    "firebase": "^12.9.0",
     "firebase-admin": "^13.6.1",
-    "nodemailer": "^8.0.0",
+    "nodemailer": "^8.0.1",
     "nodemon": "^3.1.11",
+    "punycode": "^2.3.1",
     "uuid": "^13.0.0"
   }
 }

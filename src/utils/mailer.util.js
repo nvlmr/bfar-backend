@@ -10,11 +10,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-transporter.verify(function (error, success) {
+transporter.verify((error) => {
   if (error) {
-    console.error("SMTP Connection Error:", error);
+    console.error("SMTP Error:", error);
   } else {
-    console.log("SMTP Server is ready to take our messages");
+    console.log("SMTP ready");
   }
 });
 

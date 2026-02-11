@@ -1,10 +1,19 @@
 const crypto = require("crypto");
 const transporter = require("../../utils/mailer.util");
 const { db } = require("../../config/firebase");
+const bodyParser = require("body-parser"); // ensure you have this
+
+// If using Express, make sure to use this middleware in your app.js or here
+// app.use(bodyParser.urlencoded({ extended: true }));
 
 module.exports = async (req, res) => {
   try {
-    const { email } = req.body;
+    // For URL-encoded form data:
+    const email = req.body.email; 
+
+    if (!email) {
+      return res.status(400).send("Email is required");
+    }
 
     const snapshot = await db
       .collection("users")
@@ -13,7 +22,7 @@ module.exports = async (req, res) => {
       .get();
 
     if (snapshot.empty) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).send("User not found");
     }
 
     const userDoc = snapshot.docs[0];
@@ -23,8 +32,8 @@ module.exports = async (req, res) => {
     const resetExpiry = Date.now() + 15 * 60 * 1000;
 
     await userRef.update({
-      resetToken,
-      resetExpiry,
+      reset_password_token: resetToken,          // matches your DB
+      resetExpiry: Date.now() + 15 * 60 * 1000,  // 15 minutes from now
     });
 
     const resetLink = `${process.env.FRONTEND_RESET_URL}?token=${resetToken}`;
@@ -41,12 +50,9 @@ module.exports = async (req, res) => {
       `,
     });
 
-    res.json({ message: "Password reset link sent" });
+    res.send("Password reset link sent");
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      message: "Error sending password reset link",
-      error: err.message,
-    });
+    res.status(500).send("Error sending password reset link");
   }
 };

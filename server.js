@@ -8,6 +8,7 @@ const { admin, db } = require("./src/config/firebase");
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // <-- add this
 
 app.use("/api/auth", authRoutes);
 
@@ -19,4 +20,3 @@ app.get("/test", async (req, res) => {
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
 });
-
