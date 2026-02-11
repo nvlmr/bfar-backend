@@ -1,14 +1,10 @@
 const crypto = require("crypto");
-const transporter = require("../../utils/mailer.util");
+const transporter = require("../../utils/mailer_util");
 const { db } = require("../../config/firebase");
-const bodyParser = require("body-parser"); // ensure you have this
-
-// If using Express, make sure to use this middleware in your app.js or here
-// app.use(bodyParser.urlencoded({ extended: true }));
+const bodyParser = require("body-parser");
 
 module.exports = async (req, res) => {
   try {
-    // For URL-encoded form data:
     const email = req.body.email; 
 
     if (!email) {
@@ -32,8 +28,8 @@ module.exports = async (req, res) => {
     const resetExpiry = Date.now() + 15 * 60 * 1000;
 
     await userRef.update({
-      reset_password_token: resetToken,          // matches your DB
-      resetExpiry: Date.now() + 15 * 60 * 1000,  // 15 minutes from now
+      reset_password_token: resetToken,
+      resetExpiry: Date.now() + 15 * 60 * 1000,
     });
 
     const resetLink = `${process.env.FRONTEND_RESET_URL}?token=${resetToken}`;

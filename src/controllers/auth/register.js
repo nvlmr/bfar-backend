@@ -1,25 +1,22 @@
 const { admin, db } = require("../../config/firebase");
-const transporter = require("../../utils/mailer.util");
+const transporter = require("../../utils/mailer_util");
 const crypto = require("crypto");
 
 module.exports = async (req, res) => {
   const { first_name, middle_name, last_name, email, password } = req.body;
 
   try {
-    // Validation
     if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({
         error: "First name, last name, email, and password are required",
       });
     }
 
-    // Create Firebase Auth user
     const user = await admin.auth().createUser({
       email,
       password,
     });
 
-    // Generate tokens
     const verification_link = crypto.randomBytes(32).toString("hex");
     const api_key = crypto.randomBytes(32).toString("hex");
     const csrf_token = crypto.randomBytes(32).toString("hex");
@@ -63,7 +60,6 @@ module.exports = async (req, res) => {
   } catch (error) {
     console.error(error);
 
-    // Cleanup created auth user if error occurs
     if (email) {
       const existingUser = await admin
         .auth()

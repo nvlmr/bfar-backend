@@ -12,8 +12,8 @@ module.exports = async (req, res) => {
 
     const snapshot = await db
       .collection("users")
-      .where("reset_password_token", "==", token) // match your field
-      .where("resetExpiry", ">", Date.now())      // you don't have this field yet
+      .where("reset_password_token", "==", token)
+      .where("resetExpiry", ">", Date.now())
       .limit(1)
       .get();
 
@@ -27,12 +27,10 @@ module.exports = async (req, res) => {
     const userDoc = snapshot.docs[0];
     const userData = userDoc.data();
 
-    // Update Firebase Auth password
     await admin.auth().updateUser(userData.user_id, {
       password: newPassword,
     });
 
-    // Clear reset token
     await userDoc.ref.update({
       resetToken: null,
       resetExpiry: null,
