@@ -6,7 +6,13 @@ const authRoutes = require("./src/routes/auth_routes");
 const { admin, db } = require("./src/config/firebase");
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -17,6 +23,7 @@ app.get("/test", async (req, res) => {
   res.json(snapshot.docs.map(d => d.data()));
 });
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+app.listen(5000, () => {
+  console.log("Server running on http://localhost:5000");
 });
+
