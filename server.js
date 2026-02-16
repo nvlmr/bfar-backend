@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 
 const authRoutes = require("./src/routes/auth_routes");
+const formsRoutes = require("./src/routes/forms_routes");
 const { admin, db } = require("./src/config/firebase");
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/forms", formsRoutes); // ✅ REGISTERED
 
 app.get("/test", async (req, res) => {
   const snapshot = await db.collection("users").limit(1).get();
@@ -26,4 +28,3 @@ app.get("/test", async (req, res) => {
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
 });
-

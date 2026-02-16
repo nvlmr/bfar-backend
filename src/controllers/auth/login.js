@@ -32,10 +32,16 @@ module.exports = async (req, res) => {
 
     res.json({
     message: "Login successful.",
-    idToken: response.data.idToken,
+    access_token: response.data.idToken,
     refreshToken: response.data.refreshToken,
     expiresIn: response.data.expiresIn,
-    });
+    user: {
+    email: user.email,
+    status: user.status,
+    full_name: `${user.first_name} ${user.last_name}`
+  }
+});
+
 
 
   } catch (error) {
